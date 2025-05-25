@@ -12,6 +12,11 @@ all:
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=512 count=8 >> ./bin/os.bin
 
+qemu:
+	# Use 32 bit qemu when using debugger on this 32 bit OS
+	qemu-system-x86_64 -hda ./bin/os.bin
+	#qemu-system-i386 -hda ./bin/os.bin
+
 clean:
 	rm -f ./bin/boot.bin
 	rm -f ./bin/kernel.bin

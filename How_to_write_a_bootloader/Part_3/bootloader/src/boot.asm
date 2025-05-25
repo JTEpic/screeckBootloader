@@ -18,10 +18,17 @@ start:
     mov ss, ax    ; Set stack segment (SS) to 0x00
     mov sp, 0x7c00; Set stack pointer (SP) to 0x7c00, top of the bootloader segment
     sti           ; Enable interrupts, allowing them to occur again
+
+    ; set video mode, al 03h is a text mode, this also clears the screen
+    mov AH, 00h
+    mov AL, 03h
+    int 0x10
     
 
 ;Load kernel
-mov bx, KERNEL_LOAD_SEG
+mov bx, KERNEL_LOAD_SEG ; Load segment
+mov es, bx
+mov bx, 0x0000 ; Load offset (SEG*16 + OFFSET)
 mov dh, 0x00
 mov dl, 0x80
 mov cl, 0x02
@@ -88,6 +95,13 @@ PModeMain:
     in al, 0x92
     or al, 2
     out 0x92, al
+
+    ; Copy kernel from 0x10000 to 0x100000, where we jump to, as protected mode can access past 1MB now
+    mov esi, 0x10000  ; Source
+    mov edi, KERNEL_START_ADDR ; Destination
+    mov ecx, 4096     ; num sectors * 512 bytes
+    cld
+    rep movsb
 
     jmp CODE_OFFSET:KERNEL_START_ADDR
 

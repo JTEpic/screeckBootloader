@@ -5,6 +5,6 @@ extern kernel_main
 
 _start:
     call kernel_main
-    jmp$
+    jmp $
 
-times 512-($ - $$) db 0
+times 510-($ - $$) db 0
